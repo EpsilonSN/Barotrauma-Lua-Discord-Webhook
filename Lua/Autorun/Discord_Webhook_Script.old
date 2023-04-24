@@ -1,0 +1,147 @@
+-- By
+-- Evil Factory
+
+--[[local discordWebHook = "---"
+
+
+local function escapeQuotes(str)
+    return str:gsub("\"", "\\\""):gsub("@", "")
+end
+
+local function stringstarts(String, Start)
+    return string.sub(String, 1, string.len(Start)) == Start
+end
+
+Hook.Add("chatMessage", "discordIntegration_Player", function (msg, client, type)
+    local escapedName = escapeQuotes(client.name)
+    local escapedMessage = escapeQuotes(msg)
+
+    if stringstarts(msg, "r;") then
+        Networking.RequestPostHTTP(discordWebHook, '{\"content\": \"'..escapedMessage..'\", \"username\": \"'..escapedName..'\"}')
+    end
+end)
+
+
+
+
+
+
+
+
+
+
+
+
+local discordWebHook = "---"
+
+local function escapeQuotes(str)
+    return str:gsub("\"", "\\\""):gsub("@", "")
+end
+
+Hook.Add("chatMessage", "discordIntegration", function (msg, client)
+    local escapedName = escapeQuotes(client.name)
+    local escapedMessage = escapeQuotes(msg)
+
+
+    if type == ChatMessageType.Radio then
+       Networking.RequestPostHTTP(discordWebHook, function(result) end, '{\"content\": \"'..escapedMessage..'\", \"username\": \"'..escapedName..'\"}')
+    end
+
+end)
+
+--]]
+
+--[[
+local discordWebHook = "---"
+
+local function escapeQuotes(str)
+    return str:gsub("\"", "\\\""):gsub("@", "")
+end
+
+local messageBuffer = {}
+local messageDelay = 1
+local maxSingleMessages = 15
+
+local messageTimer = 0
+
+Hook.Add("chatMessage", "discordIntegration", function (msg, client)
+    local escapedName = escapeQuotes(client.name)
+    local escapedMessage = escapeQuotes(msg)
+
+    messageBuffer[escapedMessage] = escapedName
+end)
+
+Hook.Add("think", "sendBufferedMessages", function ()
+    if Timer.GetTime() < messageTimer then return end
+
+    local appendedMessage = ""
+
+    local totalSent = 0
+    for key, value in pairs(messageBuffer) do
+        appendedMessage = appendedMessage .. '`' .. value .. '`' .. ": " .. key .. "\\n"
+
+        messageBuffer[key] = nil
+        totalSent = totalSent + 1
+        if totalSent > maxSingleMessages then break end
+    end
+
+    if appendedMessage ~= "" then
+        Networking.RequestPostHTTP(discordWebHook, function(result) end, '{\"content\": \"'..appendedMessage..'\", \"username\": \"'..'Server Logs'..'\"}')
+    end
+
+    messageTimer = Timer.GetTime() + messageDelay
+end)
+
+
+--]]
+
+
+
+
+
+
+
+
+
+
+
+--[[
+local function escapeQuotes(str)
+    return str:gsub("\"", "\\\"")
+end
+
+
+Hook.Add("chatMessage", "discordIntegration_Player", function (msg, client, type)
+    local escapedName = escapeQuotes(client.name)
+    local escapedMessage = escapeQuotes(msg)
+
+    if type == ChatMessageType.Radio then
+
+    Networking.RequestPostHTTP(discordWebHook, '{\"content\": \"'..escapedMessage..'\", \"username\": \"'..escapedName..'\"}')
+end)
+--]]--
+
+--[[--
+local discordWebHook = ""
+
+local function escapeQuotes(str)
+    return str:gsub("\"", "\\\"")
+end
+
+
+Hook.Add("chatMessage", "discordIntegration", function (msg, client, type)
+    local escapedName = escapeQuotes(client.name)
+    local escapedMessage = escapeQuotes(msg)
+    
+    if type == ChatMessageType.Radio then
+        -- do something if the type is radio
+    end
+
+    if client.Character ~= nil and client.Character.IsDead then
+        Networking.RequestPostHTTP(discordWebHook, '{\"content\": \"'..escapedMessage..'\", \"username\": \"'..escapedName..'\"}')
+    else
+        -- do other stuff if the player is still alive
+    end
+end)
+
+--]]--
